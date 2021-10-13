@@ -1,0 +1,1 @@
+INDEX VERSION 1.131+C:\DATA\c\AnypointStudio-workspace\Extra Mile Training\Exception Handling\.metadata\.plugins\org.eclipse.jdt.core

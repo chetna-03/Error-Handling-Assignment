@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="62179ac0-905e-4847-a9a5-e326b50e5a84" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="arithmeticOperation2Flow" doc:id="eea5d8d0-2402-42ea-ba33-7e2db2f683ce" >
+		<http:listener doc:name="Listener" doc:id="ccd981aa-5654-4c0b-b041-079272dafea2" config-ref="HTTP_Listener_config" path="operation"/>
+		<set-variable value='#[%dw 2.0&#10;import isNumeric from dw::core::Strings&#10;output application/java&#10;---&#10;if(isNumeric(attributes.queryParams.num1)) attributes.queryParams.num1 else "1"]' doc:name="Variable num1" doc:id="d6436cbd-b5c0-4a01-8c1e-cd27cfe2b076" variableName="num1"/>
+		<set-variable value='#[%dw 2.0&#10;import isNumeric from dw::core::Strings&#10;output application/java&#10;---&#10;if(isNumeric(attributes.queryParams.num2)) attributes.queryParams.num2 else "1"]' doc:name="Variable num2" doc:id="31dd96ec-37b8-42a2-b971-f3aaa587cfdd" variableName="num2"/>
+		<set-variable value="#[attributes.queryParams.op]" doc:name="Set Variable" doc:id="fadee71a-ec16-4b40-8473-10d92b1c7c3f" variableName="op"/>
+		<flow-ref doc:name="Flow Reference" doc:id="7797cbf2-2676-48dd-957d-7bdee428b075" name="#[vars.op]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="75eadbcf-7943-4926-a87e-9828fabcbba6" message="#[payload.result]"/>
+	</flow>
+	<sub-flow name="add" doc:id="3587ed60-bef0-497c-90f0-8e8acc67496a" >
+		<ee:transform doc:name="Transform Message" doc:id="5d1a52ef-a153-454f-a78e-15bab8bbbb73" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 + vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="subtract" doc:id="cf92ad23-606a-4fab-8830-d3f3cb740dfd" >
+		<ee:transform doc:name="Transform Message" doc:id="63cbed9b-d486-4668-89e6-6727a52c6d41" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 - vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="multiply" doc:id="3eb30143-9c64-47cb-ae37-d0c5f214446c" >
+		<ee:transform doc:name="Transform Message" doc:id="c0234de7-2263-43d6-9feb-ecae68dd2574" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 * vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="divide" doc:id="0e07c2fc-4040-4b5f-ba20-158008f19751" >
+		<ee:transform doc:name="Transform Message" doc:id="402ee3d3-3d89-4b62-a733-eecfd3e0e80b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 / vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

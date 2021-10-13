@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;arithmeticOperation2/src/main/mule/arithmeticoperation2.xml&apos; to &apos;arithmeticOperation2.xml&apos;" description="Rename resource &apos;arithmeticoperation2.xml&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/main/mule/arithmeticoperation2.xml" name="arithmeticOperation2.xml" stamp="1634052690039" updateReferences="true"/>
+</session>

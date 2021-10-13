@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.mule.tooling.runtime.muleServerLaunchType">
+<booleanAttribute key="java-debugger-enabled" value="false"/>
+<stringAttribute key="launch_mule_server_version" value="org.mule.tooling.server.4.3.0.ee"/>
+<stringAttribute key="mule-agent-port" value="63774"/>
+<stringAttribute key="mule-agent-token-auth" value="2fd521ac-6cfe-4bda-bc20-682c7797b1cd"/>
+<listAttribute key="mule-project-names">
+<listEntry value="arithmeticOperation2"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="arithmeticOperation2"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-M-XX:-UseBiasedLocking -M-Dfile.encoding=UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication"/>
+</launchConfiguration>

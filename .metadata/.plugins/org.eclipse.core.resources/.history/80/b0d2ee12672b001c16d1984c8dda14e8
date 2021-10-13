@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="229b2f93-a724-425f-ab0f-7840d5c4ec4d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="arithmeticoperationFlow" doc:id="d5ab23d8-a1ff-44eb-a9e7-97a6a02bd423" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="9203aca3-d4d0-45a6-becf-01144c40c9dc" config-ref="HTTP_Listener_config" path="/operation"/>
+		<set-variable value="#[attributes.queryParams.num1]" doc:name="Variable num1" doc:id="2acf28b5-426e-425e-bbb3-74df1de8c427" variableName="num1"/>
+		<set-variable value="#[attributes.queryParams.num2]" doc:name="Variable num2" doc:id="b0e1eecf-237e-4165-a802-91ef267416ec" variableName="num2"/>
+		<choice doc:name="Choice" doc:id="13f5d841-ad0d-4c1e-affe-b93f1a1a9ec2" >
+			<when expression="#[isNumeric(vars.num1) and isNumeric(vars.num2)]">
+				<ee:transform doc:name="Transform Message" doc:id="dce483f7-5904-477f-bbca-9ec86d51ba14" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"sum" : vars.num1 + vars.num2
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="e8759d42-9865-4316-9245-a3d7209eb1ed" message="#[payload.sum]"/>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="97d98d07-18ba-4822-830a-5a9af9e78761" type="ANY" description="The inputs for the arithmetic operations are invalid"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="arithmeticoperationFlow1" doc:id="b58a9706-4191-4cd9-9844-5bec928f698f" initialState="started">
+		<http:listener doc:name="Listener" doc:id="129c0085-f7cd-4758-b4e1-e5126888c22c" config-ref="HTTP_Listener_config" path="/check"/>
+		<set-variable value="#[attributes.queryParams.num1 as Number]" doc:name="Set Variable" doc:id="f6419aa8-9824-4416-a0f5-034fd0a80d0c" variableName="num1"/>
+		<choice doc:name="Choice" doc:id="574e33b8-ad7a-4201-9d12-f7679d77c775" >
+			<when expression='#[typeOf(vars.num1) == "Number"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="3ccd1820-657e-4b67-8def-bff81480025b" message="A number"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="2e7fe201-707d-43f0-9d49-d256d67c5bdc" message="Not a number"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="229b2f93-a724-425f-ab0f-7840d5c4ec4d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="arithmeticoperationFlow" doc:id="d5ab23d8-a1ff-44eb-a9e7-97a6a02bd423" initialState="started">
+		<http:listener doc:name="Listener" doc:id="9203aca3-d4d0-45a6-becf-01144c40c9dc" config-ref="HTTP_Listener_config" path="/operation"/>
+		<set-variable value="#[attributes.queryParams.num1]" doc:name="Variable num1" doc:id="2acf28b5-426e-425e-bbb3-74df1de8c427" variableName="num1"/>
+		<set-variable value="#[attributes.queryParams.num2]" doc:name="Variable num2" doc:id="b0e1eecf-237e-4165-a802-91ef267416ec" variableName="num2"/>
+		<set-variable value="#[attributes.queryParams.op]" doc:name="Operation" doc:id="c85ec577-f738-4d89-9045-2549d369cba6" variableName="op"/>
+		<choice doc:name="Choice" doc:id="13f5d841-ad0d-4c1e-affe-b93f1a1a9ec2" >
+			<when expression="#[%dw 2.0&#10;import isNumeric from dw::core::Strings&#10;output application/Boolean&#10;---&#10;isNumeric(vars.num1) and isNumeric(vars.num2)]">
+				<flow-ref doc:name="Flow Reference" doc:id="cf1cbc85-95b0-41ba-b6e5-0908610b9421" name="#[vars.op]"/>
+				<logger level="INFO" doc:name="Logger" doc:id="f63ecc0a-514f-49bd-ad86-d54547805d8f" message="#[payload.result]"/>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="97d98d07-18ba-4822-830a-5a9af9e78761" type="ANY" description="The inputs for the arithmetic operations are invalid"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<sub-flow name="add" doc:id="4b982733-eb36-4e0f-93d9-3e5e3473555f" >
+		<ee:transform doc:name="Transform Message" doc:id="b65569fa-21a9-4944-9e1e-59402ac3a426" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 + vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="subtract" doc:id="cab29e00-d35d-47a8-a345-0b1be796e342" >
+		<ee:transform doc:name="Transform Message" doc:id="d75108e6-f6ad-4c31-9e26-cb54fb609de4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 - vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="multiply" doc:id="6a9ed5fa-4a66-4b78-80f2-d793d359bce7" >
+		<ee:transform doc:name="Transform Message" doc:id="5a92e990-a01f-4db2-bcce-615b0026f697" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 * vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="divide" doc:id="066a3693-6712-4fa0-887a-0d6ea2086568" >
+		<ee:transform doc:name="Transform Message" doc:id="9b5f36ca-df95-4ffe-a883-12d77748937a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : vars.num1 / vars.num2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

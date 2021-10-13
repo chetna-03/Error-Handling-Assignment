@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<http:listener-config name="HTTP_Listener_config"
+		doc:name="HTTP Listener config"
+		doc:id="50b7d2a7-a02d-45c3-b927-f30504654fa7">
+		<http:listener-connection host="0.0.0.0"
+			port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="df064fee-14d4-46d8-adb3-872acf1b6a70" >
+		<file:connection workingDir="C:\Users\chetnalal\Documents" />
+	</file:config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="3fc7a4b6-57bb-43b4-9736-8dc89bb9e37a" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="db" >
+			<db:connection-properties >
+
+			<db:connection-property key="useSSL" value="false" />
+			
+			</db:connection-properties>
+		</db:my-sql-connection>
+	</db:config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="132b2f0f-6849-4529-b701-1ff311219316" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="db" >
+		<db:connection-properties >
+
+			<db:connection-property key="useSSL" value="false" />
+			
+			</db:connection-properties>
+		</db:my-sql-connection>
+	</db:config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="0ee4ec3e-6a68-4704-8039-daeebc2e55bf" >
+		<email:smtp-connection host="smtp.gmail.com" port="465" user="chetna.lal@apisero.com" password="Chetna@031198"/>
+	</email:smtp-config>
+	<flow name="insertrecordsFlow" doc:id="8dc0a879-4397-43f6-a2a7-28e678ebc578" >
+		<http:listener doc:name="Listener" doc:id="209dc37c-a090-479f-b757-84f408b54fdd" config-ref="HTTP_Listener_config" path="/insert"/>
+		<file:read doc:id="6e69e810-5554-48ff-8a97-926d2ec97e6a" config-ref="File_Config" path="C:\Users\chetnalal\Documents\orderDetails.csv"/>
+		<ee:transform doc:name="Transform Message" doc:id="9b0c5232-f1bb-4dea-8049-84af7e17e312" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	id: payload01.OrderId as String,
+	orderName: payload01.OrderName,
+	orderNumber: payload01.OrderNumber,
+	orderAmount: payload01.OrderAmount
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="cbe43bf3-2ab5-48ba-8285-3bc99adb2e06" >
+			<try doc:name="Try" doc:id="e633afc3-40f1-4e62-a317-043c68553218" >
+				<db:insert doc:name="Insert" doc:id="ee817ea2-d1d4-4c1b-8d46-581708051131" config-ref="Database_Config1">
+					<db:sql ><![CDATA[insert into orderDetails(id,orderName,orderNumber,orderAmount) values (:id,:orderName,:orderNumber,:orderAmount);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[payload]]]></db:input-parameters>
+				</db:insert>
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ec080152-5c7d-40bd-a7e1-29a94e3c63d7" >
+						<logger level="INFO" doc:name="Logger" doc:id="2614b452-ee0a-45e5-9850-c1b0df931752" message="#[payload]"/>
+						<email:send doc:id="26a03d2a-3983-4351-9d92-c810be4d0a20" config-ref="Email_SMTP" fromAddress="chetna.lal@apisero.com" subject="Error Handling Testing">
+							<email:to-addresses >
+								<email:to-address value="lalchetna03@gmail.com" />
+							</email:to-addresses>
+							<email:properties > 
+							<email:property key="mail.smtp.starttls.enable" value="true" /> 
+							</email:properties>
+							<email:body >
+								<email:content ><![CDATA[#["<h1>Error in inserting record in database</h1>"]]]></email:content>
+							</email:body>
+						</email:send>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</foreach>
+	</flow>
+</mule>

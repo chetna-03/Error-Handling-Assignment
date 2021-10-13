@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.mule.tooling.runtime.muleServerLaunchType">
+<booleanAttribute key="java-debugger-enabled" value="false"/>
+<stringAttribute key="launch_mule_server_version" value="org.mule.tooling.server.4.3.0.ee"/>
+<stringAttribute key="mule-agent-port" value="64769"/>
+<stringAttribute key="mule-agent-token-auth" value="894d93d1-8ae9-4725-ac83-7821eb0a7ce9"/>
+<listAttribute key="mule-project-names">
+<listEntry value="insertRecordsInDB"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="insertRecordsInDB"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-M-XX:-UseBiasedLocking -M-Dfile.encoding=UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication"/>
+</launchConfiguration>
